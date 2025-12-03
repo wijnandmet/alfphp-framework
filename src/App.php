@@ -1,39 +1,58 @@
 <?php
+
 namespace ALF;
 
 use ALF\Traits\InstanceObject;
-class App {
+
+class App
+{
     use InstanceObject;
-    private function load($method) {
-        if($method instanceof \Closure) {
+
+    private function load($method)
+    {
+
+        // anonymous method
+        if ($method instanceof \Closure) {
             $rf = new \ReflectionFunction($method);
-            foreach($rf->getParameters() AS $parameter) {
-                $name = $parameter->getName();
-                if ($parameter->hasType()) {
-                    $type = $parameter->getType()->getName();
-                }
-                $defaultValue = null;
-                if ($parameter->isDefaultValueAvailable()) {
-                    $defaultValue = $parameter->getDefaultValue();
-                }
+            $parameters = $this->getParametersFromMethod($rf);
 
+            return call_user_func_array($method, $parameters);
+        } else if (is_array($method)) {
+            $reflectionClass = new \ReflectionClass($method[0]);
+            $rf = $reflectionClass->getMethod($method[1]);
+            $parameters = $this->getParametersFromMethod($rf);
 
-
-                echo '<hr>';
-                var_export($parameter->getAttributes());
-            };
-        } else if (is_callable($method)) {
-            var_export($method);
-            echo 'objct!!!!! (App.php regel 9)';
-            //$reflectionClass = new ReflectionClass('MyClass');
-            //echo $reflectionClass->getName(); // Outputs "MyClass"
-            // $reflectionMethod = $reflectionClass->getMethod('add');
-//            $object = $reflectionClass->newInstance();
-//            $result = $reflectionMethod->invoke($object, 16, 26);
+            return call_user_func_array(array($method[0], $method[1]), $parameters);
         }
 
 
         // if
         echo 'a';
+    }
+
+    private function getParametersFromMethod(\ReflectionFunction $rf)
+    {
+        $parameters = [];
+        foreach ($rf->getParameters() as $parameter) {
+            $name = $parameter->getName();
+            $type = $parameter->getType();
+            if ($parameter->hasType()) {
+                $type = $parameter->getType()->getName();
+            }
+
+            $defaultValue = null;
+            if ($parameter->isDefaultValueAvailable()) {
+                $defaultValue = $parameter->getDefaultValue();
+            }
+
+            if ($type !== null && class_exists($type)) {
+                $value = new $type();
+            } else {
+                $value = $defaultValue || null;
+            }
+
+            $parameters[$name] = $value;
+        }
+        return $parameters;
     }
 }

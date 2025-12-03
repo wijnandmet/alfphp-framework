@@ -1,8 +1,8 @@
 <?php
 namespace ALF;
 
-use ALF\Traits\InstanceObject;
 use ALF\App;
+use ALF\Traits\InstanceObject;
 
 class Route {
     use InstanceObject;
@@ -13,13 +13,16 @@ class Route {
         $uri = Request::get('url');
 
         $currentRoute = self::$_routes[$uri];
-        if (is_callable($currentRoute)) {
+        if (is_array($currentRoute)) {
             return App::load($currentRoute);
         }
     }
 
-    private function get($uri, $controller)
+    private function get($uri, $controller, $method= null)
     {
+        if ($method) {
+            $controller = [$controller, $method];
+        }
         self::$_routes[trim($uri, '/')] = $controller;
     }
 
