@@ -1,0 +1,10 @@
+{
+  "name": "wijnanmet/alfphp-framework",
+  "description": "Awesomely Light Framework for PHP",
+  "authors": [
+    {
+      "name": "Wijnand de Ridder",
+      "email": "wijnandmet@gmail.com"
+    }
+  ]
+}
