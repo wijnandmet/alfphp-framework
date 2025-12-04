@@ -27,17 +27,12 @@ class View {
         };
 
         ob_flush();
-        require('.' . DIRECTORY_SEPARATOR . 'App' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . str_replace('/' , DIRECTORY_SEPARATOR, $this->_view['path']));
-        return ob_get_clean();
-    }
-
-    private function renderFromPackage() : string {
-        foreach ($this->_view['vars'] AS $key => $value) {
-            $$key = $value;
-        };
-
-        ob_flush();
-        require(rtrim(__DIR__, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $this->_view['path']));
+        $path = '.' . DIRECTORY_SEPARATOR . 'App' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . str_replace('/' , DIRECTORY_SEPARATOR, $this->_view['path']);
+        if (file_exists($path)) {
+            require($path);
+        } else {
+            require(rtrim(__DIR__, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $this->_view['path']));
+        }
         return ob_get_clean();
     }
 
