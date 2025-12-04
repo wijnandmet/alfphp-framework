@@ -6,5 +6,8 @@
       "name": "Wijnand de Ridder",
       "email": "wijnandmet@gmail.com"
     }
+  ],
+  "files": [
+    "src/helpers.php"
   ]
 }

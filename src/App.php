@@ -22,7 +22,7 @@ class App
 
             return call_user_func_array([new $method[0], $method[1]], $parameters);
         } else {
-            return 'a';
+            throw new \Exception('Could not load App-method');
         }
     }
 
@@ -49,6 +49,7 @@ class App
 
             $parameters[$name] = $value;
         }
+
         return $parameters;
     }
 }

@@ -30,4 +30,9 @@ class Request {
         $this->set('port', $_SERVER['SERVER_PORT']);
         $this->set('host', $_SERVER['HTTP_HOST']);
     }
+
+    public function __serialize(): array
+    {
+        return $this->all();
+    }
 }

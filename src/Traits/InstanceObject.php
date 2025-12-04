@@ -18,7 +18,9 @@ trait InstanceObject
         if (method_exists(self::class, $name)) {
             return self::_instanceObject()->$name(...$arguments);
         }
-        return null;
+
+
+        throw new \Exception('Could not load ' . $name . ' of class ' . __CLASS__ . ' because it does not exist');
     }
 
     public function __call($name, $arguments)
@@ -26,6 +28,7 @@ trait InstanceObject
         if (method_exists($this, $name)) {
             return $this->$name(...$arguments);
         }
-        return null;
+
+        throw new \Exception('Could not load ' . $name . ' of class ' . __CLASS__ . ' because it does not exist');
     }
 }

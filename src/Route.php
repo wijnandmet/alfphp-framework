@@ -11,7 +11,19 @@ class Route {
 
     private function load() {
         $uri = '/' . Request::get('url');
-        return App::load(self::$_routes[$uri]);
+        if ($route = self::$_routes[$uri]) {
+            return App::load(self::$_routes[$uri]);
+        }
+
+        $resource_path = rtrim($_SERVER['DOCUMENT_ROOT'],'/') . '/App/resources/' . trim($uri, '/');
+        if (file_exists($resource_path)) {
+            ob_clean();
+            $content = file_get_contents($resource_path);
+            echo $content;
+            exit;
+        }
+
+        throw new \Exception('Route not found: ' . $uri);
     }
 
     private function get($uri, $controller, $method= null)
