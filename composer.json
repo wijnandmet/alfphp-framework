@@ -7,7 +7,9 @@
       "email": "wijnandmet@gmail.com"
     }
   ],
-  "files": [
-    "src/helpers.php"
-  ]
+  "autoload": {
+    "files": [
+      "src/helpers.php"
+    ]
+  }
 }
