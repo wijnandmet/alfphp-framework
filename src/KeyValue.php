@@ -10,14 +10,14 @@ class KeyValue {
     }
 
     public static function set($category, $key, $value): void {
-        if (self::$_vars[$category]) {
+        if (!isSet(self::$_vars[$category])) {
             self::$_vars[$category] = [];
         }
         self::$_vars[$category][$key] = $value;
     }
 
     public static function setArray($category, $array): void {
-        if (self::$_vars[$category]) {
+        if (!isSet(self::$_vars[$category])) {
             self::$_vars[$category] = [];
         }
         self::$_vars[$category] = [...self::$_vars[$category], ...$array];

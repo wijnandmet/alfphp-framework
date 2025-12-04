@@ -9,7 +9,7 @@
   ],
   "autoload": {
     "files": [
-      "src/helpers.php"
+      "./helpers.php"
     ]
   }
 }
