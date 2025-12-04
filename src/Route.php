@@ -11,7 +11,7 @@ class Route {
 
     private function load() {
         $uri = '/' . Request::get('url');
-        if ($route = self::$_routes[$uri]) {
+        if (isSet( self::$_routes[$uri])) {
             return App::load(self::$_routes[$uri]);
         }
 

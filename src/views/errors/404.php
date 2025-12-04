@@ -28,30 +28,29 @@
     <main>
         <h1>404 Error</h1>
 
-        <p><?php echo $error->getMessage();?></p>
+        <?php if (env('DEBUG')) { ?>
+            <p><?php echo $error['message'];?></p>
 
-        <table>
-            <thead>
-                <tr>
-                    <td>File</td>
-                    <td>Line</td>
-                    <td>Class</td>
-                    <td>Method</td>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                foreach ($error->getTrace() as $error) {
-                    echo '<tr>';
-                    echo '<td>' . $error['file'] . '</td>';
-                    echo '<td>' . $error['line'] . '</td>';
-                    echo '<td>' . $error['class'] . '</td>';
-                    echo '<td>' . $error['function'] . '</td>';
-                    echo '</tr>';
-                }
-                ?>
-            </tbody>
-        </table>
+            <h2>Trace</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <td>File</td>
+                        <td>Line</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    foreach ($error['trace'] as $error) {
+                        echo '<tr>';
+                        echo '<td>' . ($error['file'] ?? '') . '</td>';
+                        echo '<td>' . ($error['line'] ?? '') . '</td>';
+                        echo '</tr>';
+                    }
+                    ?>
+                </tbody>
+            </table>
+        <?php } ?>
     </main>
 </body>
 </html>
