@@ -21,8 +21,10 @@ class Request {
 
     function __construct() {
         $this->set('url', trim($_SERVER['SCRIPT_NAME'], '/'));
-        parse_str($_SERVER['QUERY_STRING'], $queryArr);
-        $this->set('params', $queryArr);
+        if (!empty($_SERVER['QUERY_STRING'])) {
+            parse_str($_SERVER['QUERY_STRING'], $queryArr);
+        }
+        $this->set('params', $queryArr ?? []);
         $this->set('method', $_SERVER['REQUEST_METHOD']);
         $this->set('domain', $_SERVER['SERVER_NAME']);
         $this->set('port', $_SERVER['SERVER_PORT']);

@@ -10,12 +10,8 @@ class Route {
     static $_routes = [];
 
     private function load() {
-        $uri = Request::get('url');
-
-        $currentRoute = self::$_routes[$uri];
-        if (is_array($currentRoute)) {
-            return App::load($currentRoute);
-        }
+        $uri = '/' . Request::get('url');
+        return App::load(self::$_routes[$uri]);
     }
 
     private function get($uri, $controller, $method= null)
@@ -23,7 +19,7 @@ class Route {
         if ($method) {
             $controller = [$controller, $method];
         }
-        self::$_routes[trim($uri, '/')] = $controller;
+        self::$_routes['/' . trim($uri, '/')] = $controller;
     }
 
     private function post($uri, $controller)

@@ -8,9 +8,7 @@ class App
 {
     use InstanceObject;
 
-    private function load($method)
-    {
-
+    private function load($method) {
         // anonymous method
         if ($method instanceof \Closure) {
             $rf = new \ReflectionFunction($method);
@@ -22,15 +20,13 @@ class App
             $rf = $reflectionClass->getMethod($method[1]);
             $parameters = $this->getParametersFromMethod($rf);
 
-            return call_user_func_array(array($method[0], $method[1]), $parameters);
+            return call_user_func_array([new $method[0], $method[1]], $parameters);
+        } else {
+            return 'a';
         }
-
-
-        // if
-        echo 'a';
     }
 
-    private function getParametersFromMethod(\ReflectionFunction $rf)
+    private function getParametersFromMethod(\ReflectionFunction|\ReflectionMethod $rf)
     {
         $parameters = [];
         foreach ($rf->getParameters() as $parameter) {
