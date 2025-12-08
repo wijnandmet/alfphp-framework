@@ -41,16 +41,20 @@
                 </thead>
                 <tbody>
                     <?php
-                    foreach ($error['trace'] as $error) {
+                    foreach ($error['trace'] as $e) {
                         echo '<tr>';
-                        echo '<td>' . ($error['file'] ?? '') . '</td>';
-                        echo '<td>' . ($error['line'] ?? '') . '</td>';
+                        echo '<td>' . ($e['file'] ?? '') . '</td>';
+                        echo '<td>' . ($e['line'] ?? '') . '</td>';
                         echo '</tr>';
                     }
                     ?>
                 </tbody>
             </table>
-        <?php } ?>
+        <?php } else {
+            ?>
+                <p>There is an unknown error.</p>
+            <?php
+        } ?>
     </main>
 </body>
 </html>

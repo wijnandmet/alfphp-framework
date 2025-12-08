@@ -10,6 +10,9 @@ class Route {
     static $_routes = [];
 
     private function load() {
+        $path = rtrim($_SERVER['DOCUMENT_ROOT'], DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'App' . DIRECTORY_SEPARATOR . 'routes.php';
+        require_once($path);
+
         $uri = '/' . Request::get('url');
         if (isSet( self::$_routes[$uri])) {
             return App::load(self::$_routes[$uri]);
