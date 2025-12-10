@@ -22,4 +22,8 @@ class KeyValue {
         }
         self::$_vars[$category] = [...self::$_vars[$category], ...$array];
     }
+
+    public static function has($category, $key): bool {
+        return isset(self::$_vars[$category][$key]);
+    }
 }

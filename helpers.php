@@ -40,3 +40,44 @@ if (!function_exists('env')) {
         }
     }
 }
+
+if (!function_exists('lang')) {
+    function lang($key, $defaultValue)
+    {
+        if (KeyValue::has('lang', $key)) {
+            return KeyValue::get('lang', $key);
+        }
+
+        return $defaultValue;
+    }
+}
+
+if (!function_exists('array_flatten')) {
+    function array_flatten($array, $prefix = '')
+    {
+        $result = array();
+
+        foreach ($array as $key => $value) {
+            $new_key = $prefix . (empty($prefix) ? '' : '.') . $key;
+
+            if (is_array($value)) {
+                $result = array_merge($result, array_flatten($value, $new_key));
+            } else {
+                $result[$new_key] = $value;
+            }
+        }
+
+        return $result;
+    }
+}
+
+if (!function_exists('debug')) {
+    function debug($value)
+    {
+        echo '<pre>';
+        var_export($value);
+        echo '</pre>';
+        exit;
+    }
+}
+
