@@ -1,7 +1,7 @@
 <?php
 use ALF\KeyValue;
 
-if (!function_exists('exception_to_error')) {
+if (!function_exists('shutdown')) {
     function shutdown() {
         $error = error_get_last();
         if ($error) {
@@ -27,6 +27,7 @@ if (!function_exists('exception_to_error')) {
         ];
     }
 }
+
 if (!function_exists('env')) {
     function env($key, $value = null)
     {
@@ -72,12 +73,14 @@ if (!function_exists('array_flatten')) {
 }
 
 if (!function_exists('debug')) {
-    function debug($value)
+    function debug($value, $stop = true)
     {
         echo '<pre>';
         var_export($value);
         echo '</pre>';
-        exit;
+		if ($stop) {
+			exit;
+		}
     }
 }
 

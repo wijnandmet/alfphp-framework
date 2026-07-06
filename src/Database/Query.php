@@ -4,9 +4,88 @@ namespace ALF\Database;
 
 class Query
 {
-    public function get(array $queryData) {
-        // @TODO: maak een query en voer 'm uit
+	protected $_mdl = null;
+	protected array $_querybuilder = [
+		'select' => '*',
+		'table' => '',
+		'where' => [],
+		'joins' => [],
+		'order' => [],
+		'group' => [],
+		'limit' => null
+	];
+
+	public function __construct($mdl = null) {
+		if ($mdl) {
+			$this->_mdl = new $mdl;
+		}
+	}
+
+	public function first() {
+		$item = $this->limit(1)->get();
+		return $item[0];
+	}
+
+	public function last() {
+		$item = $this->order('id', 'DESC')->limit(1)->get();
+		return $item[0];
+	}
+
+	public function get() {
+		$results = $this->_get_query($this->_querybuilder);
+
+		if ($this->_mdl !== null) {
+			$list = [];
+			if (!empty($results)) {
+				foreach ($results AS $result) {
+					$list[] = (clone $this->_mdl)->fill($result);
+				}
+			}
+			return $list;
+		}
+
+		return $results;
     }
+
+	public function table(string $table) {
+		$this->table = $table;
+	}
+
+	public function where($key, $value, $type = '=') {
+		$this->_querybuilder['where'][] = ['column' => $key, 'value' => $value, 'type' => $type];
+		return $this;
+	}
+
+
+
+	private function join($table, $keyValues) {
+		$this->_querybuilder['joins'][$table] = [
+			'keyValues' => $keyValues
+		];
+		return $this;
+	}
+
+	private function select($keyValues) {
+		$this->_querybuilder['select'] = [...$this->_querybuilder['select'], $keyValues];
+		return $this;
+	}
+
+	private function order(string $order) {
+		$this->_querybuilder['order'][] = $order;
+		return $this;
+	}
+
+	private function group(mixed $group) {
+		$this->_querybuilder['group'][] = $group;
+		return $this;
+	}
+
+	private function limit(int $limit, int $offset = 0) {
+		$this->_querybuilder['limit'] = $limit;
+		$this->_querybuilder['offset'] = $offset;
+		return $this;
+	}
+
 
     public function save(ModelItem $model, $data) {
         // update or insert
@@ -25,40 +104,115 @@ class Query
 
     }
 
-    private function _query(string $query, array $params = []) {
-        /*try {
-            $conn = new PDO("mysql:host=$servername;dbname=myDB", $username, $password);
-            // set the PDO error mode to exception
-            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            echo "Connected successfully";
-        } catch(PDOException $e) {
-            echo "Connection failed: " . $e->getMessage();
-        }*/
+    private function _get_query(array $querybuilder) {
+		$query = [];
+		$params = [];
 
+		// SELECT
+		$select = '{$this->table}.*';
+		if (!empty($querybuilder['select'])) {
+			$select = is_array($querybuilder['select'])
+				? implode(', ', $querybuilder['select'])
+				: $querybuilder['select'];
+		}
+		$query[] = "SELECT {$select}";
 
-      /*  if ($conn->query($sql) === TRUE) {
-            echo "Table MyGuests created successfully";
-        } else {
-            echo "Error creating table: " . $conn->error;
-        }*/
+		// FROM
+		if ($this->_mdl->table) {
+			$this->table = $this->_mdl->table;
+		}
+		$query[] = "FROM {$this->table}";
 
-     /*   $stmt = $conn->prepare("INSERT INTO MyGuests (firstname, lastname, email) VALUES (?, ?, ?)");
-        $stmt->bind_param("sss", $firstname, $lastname, $email);
-        $stmt->execute();*/
-        /*
-         *
-if ($result->num_rows > 0) {
-  // output data of each row
-  while($row = $result->fetch_assoc()) {
-    echo "id: " . $row["id"]. " - Name: " . $row["firstname"]. " " . $row["lastname"]. "<br>";
-  }
+		// join
+		if (!empty($querybuilder['joins'])) {
+			foreach ($querybuilder['joins'] AS $join) {
+				$query[] = "{$join['type']} JOIN {$join['table']} ON " . $join['column-left'] . ' = ' . $join['column-right'];
+			}
+		}
 
-        //LIMIT 15, 10";
+		// where
+		$number = 0;
+		if (!empty($querybuilder['where'])) {
+			$where = [];
 
-         */
-        //   $last_id = $conn->insert_id;
+			foreach ($querybuilder['where'] as $condition) {
+				$operator = strtoupper($condition['type'] ?? '=');
+				$placeholder = ':' . preg_replace('/\W/', '_', $condition['column']) . '_' . $number;
 
+				switch ($operator) {
+					case 'LIKE':
+						$where[] = "`{$condition['column']}` LIKE {$placeholder}";
+						$params[str_replace(':', '', $placeholder)] = $condition['value'];
+						break;
 
-        //$conn = null;
+					case 'IN':
+						$placeholders = [];
+
+						foreach ($condition['value'] as $i => $value) {
+							$ph = "{$placeholder}_{$i}";
+							$placeholders[] = $ph;
+							$params[str_replace(':', '', $ph)] = $value;
+						}
+
+						$where[] = "`{$condition['column']}` IN (" . implode(', ', $placeholders) . ")";
+						break;
+
+					case 'IS NULL':
+					case 'IS NOT NULL':
+						$where[] = "`{$condition['column']}` {$operator}";
+						break;
+
+					default:
+						$where[] = "`{$condition['column']}` {$operator} {$placeholder}";
+						$params[str_replace(':', '', $placeholder)] = $condition['value'];
+				}
+				$number++;
+			}
+
+			$query[] = 'WHERE ' . implode(' AND ', $where);
+		}
+
+		// group by
+		if (!empty($querybuilder['group'])) {
+			$query[] = 'GROUP BY ' . implode(', ', $querybuilder['group']);
+		}
+
+		// order by
+		if (!empty($querybuilder['order'])) {
+			$order = [];
+
+			foreach ($querybuilder['order'] as $column => $direction) {
+				$direction = strtoupper($direction);
+				$direction = $direction === 'DESC' ? 'DESC' : 'ASC';
+
+				$order[] = "{$column} {$direction}";
+			}
+
+			$query[] = 'ORDER BY ' . implode(', ', $order);
+		}
+
+		// limit
+		if ($querybuilder['limit'] !== null) {
+			$query[] = 'LIMIT ' . (int)$querybuilder['limit'];
+		}
+
+		// offset
+		if ($querybuilder['limit'] !== null) {
+			$query[] = 'LIMIT ' . (int)$querybuilder['limit'];
+
+			if (!empty($querybuilder['offset'])) {
+				$query[] = 'OFFSET ' . (int)$querybuilder['offset'];
+			}
+		}
+
+		$sql = implode(' ', $query);
+
+		$conn = new \PDO(env('DB_TYPE') . ":host=". env('DB_HOST') . ";dbname=" . env('DB_NAME'), env('DB_USERNAME'), env('DB_PASSWORD'));
+		$conn->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+
+		$statement = $conn->prepare($sql);
+		$statement->execute($params);
+
+		return $statement->fetchAll(\PDO::FETCH_ASSOC);
     }
 }

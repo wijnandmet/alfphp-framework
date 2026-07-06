@@ -2,24 +2,31 @@
 
 namespace ALF\Database;
 
+
 class Model
 {
-    private string $table = '';
+	use \ALF\Traits\Inflator;
+
+    public string $table = '';
 
     private array $columns = [];
 
+	private array $_data = [];
+
     protected \ALF\Database\ModelItem $_item;
 
-    protected array $_querybuilder = [
-        'select' => '*',
-        'where' => [],
-        'joins' => [],
-        'order' => [],
-        'group' => [],
-        'limit' => null
-    ];
+	public function __construct() {
+		if ($this->table === '') {
+			$table = $this->removeEndWord(get_class($this), 'Model');
+			$table = $this->tableify($table);
+			$table = $this->pluralize($table);
+			$this->table = $table;
+		}
+	}
 
-    protected function hasOne(String $class, $columnname = null) {
+
+
+    public function hasOne(String $class, $columnname = null) {
         $mdl = new $class;
 
         if ($columnname === null) {
@@ -30,7 +37,7 @@ class Model
         return null;
     }
 
-    protected function hasMany(String $class, $columnname = null) {
+    public function hasMany(String $class, $columnname = null) {
         $mdl = new $class;
         if ($columnname === null) {
             $columnname = $this->getTable() . '_id';
@@ -40,56 +47,14 @@ class Model
         return null;
     }
 
-    private function get() {
-        // @TODO: return all() --> first
-        $item = $this->limit(1)->all();
-        return $item[0];
-    }
+	public function fill($data) {
+		return $this->_data = $data;
+	}
 
-    private function all() {
-
-        // @TODO: return all
-    }
-
-    private function where($key, $value, $type = '=') {
-        // @TODO: return $this and add where
-        $this->_querybuilder['where'][$key] = ['value' => $value, 'type' => $type];
-        return $this;
-    }
-
-
-
-    private function join($table, $keyValues) {
-        $this->_querybuilder['joins'][$table] = [
-            'keyValues' => $keyValues
-        ];
-        return $this;
-    }
-
-    private function select($keyValues) {
-        $this->_querybuilder['select'] = [...$this->_querybuilder['select'], $keyValues];
-        return $this;
-    }
-
-    private function order(string $order) {
-        $this->_querybuilder['order'][] = $order;
-        return $this;
-    }
-
-    private function group(mixed $group) {
-        $this->_querybuilder['group'][] = $group;
-        return $this;
-    }
-
-    private function limit(int $limit, int $offset = 0) {
-        $this->_querybuilder['limit'] = $limit;
-        $this->_querybuilder['offset'] = $offset;
-        return $this;
-    }
-
-    private function save() {
+	public function save() {
         // @todo save!
-        $data = $this->_item->getData();
+        $data = $this->_data;
+		debug('save', $data);
         // do query -> execute
     }
 

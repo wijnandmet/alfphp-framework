@@ -11,5 +11,8 @@
     "files": [
       "./helpers.php"
     ]
+  },
+  "require": {
+    "doctrine/inflector": "^2.0"
   }
 }
