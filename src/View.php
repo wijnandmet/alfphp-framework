@@ -30,11 +30,6 @@ class View {
     }
 
     private function render() : string {
-
-		echo '<pre>';
-		print_r($this->_vars);
-		echo '</pre>';
-
 		return $this->_twig->render($this->_file, $this->_vars);
     }
 
@@ -47,11 +42,4 @@ class View {
 			}));
 		};
 	}
-
- /*   private function exist() {
-        if (file_exists('./App/views/' . $this->_view['path'])) {
-            return true;
-        }
-        return false;
-    }*/
 }
