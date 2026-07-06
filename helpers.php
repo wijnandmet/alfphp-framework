@@ -7,7 +7,12 @@ if (!function_exists('shutdown')) {
         if ($error) {
             ob_end_clean();
             http_response_code(404);
-            echo View::load('errors/404.php')->with(['error' => $error])->render();
+
+			if ($error['type'] == E_ERROR) {
+				$error['trace'] = array_reverse(debug_backtrace());
+			}
+
+            echo view('errors/404')->with(['error' => $error])->render();
             exit;
         }
     }
@@ -51,6 +56,14 @@ if (!function_exists('lang')) {
 
         return $defaultValue;
     }
+}
+
+if (!function_exists('view')) {
+	function view(string $file)
+	{
+		$view = \ALF\View::load($file);
+		return $view;
+	}
 }
 
 if (!function_exists('array_flatten')) {

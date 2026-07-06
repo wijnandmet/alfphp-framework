@@ -13,6 +13,7 @@
     ]
   },
   "require": {
-    "doctrine/inflector": "^2.0"
+    "doctrine/inflector": "^2.0",
+    "twig/twig": "^3.0"
   }
 }

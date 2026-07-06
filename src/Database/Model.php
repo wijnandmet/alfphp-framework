@@ -9,11 +9,9 @@ class Model
 
     public string $table = '';
 
-    private array $columns = [];
+    public array $columns = [];
 
-	private array $_data = [];
-
-    protected \ALF\Database\ModelItem $_item;
+	public array $_data = [];
 
 	public function __construct() {
 		if ($this->table === '') {
@@ -48,7 +46,8 @@ class Model
     }
 
 	public function fill($data) {
-		return $this->_data = $data;
+		$this->_data = $data;
+		return $this;
 	}
 
 	public function save() {
@@ -61,4 +60,17 @@ class Model
     private function getTable() {
         return $this->table;
     }
+
+
+	public function __get($name) {
+		return $this->_data[$name];
+	}
+
+	public function __isset($name) {
+		return isset($this->_data[$name]);
+	}
+
+	public function __set($key, $value) {
+		$this->_data[$key] = $value;
+	}
 }

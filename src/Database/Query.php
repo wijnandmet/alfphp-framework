@@ -5,9 +5,10 @@ namespace ALF\Database;
 class Query
 {
 	protected $_mdl = null;
+	protected $table;
+
 	protected array $_querybuilder = [
 		'select' => '*',
-		'table' => '',
 		'where' => [],
 		'joins' => [],
 		'order' => [],
