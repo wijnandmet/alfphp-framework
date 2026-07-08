@@ -97,3 +97,26 @@ if (!function_exists('debug')) {
     }
 }
 
+if (!function_exists('vite')) {
+	function vite(string $entry): string
+	{
+		$production = env('PRODUCTION');
+
+		$base = $production
+			? $_SERVER['DOCUMENT_ROOT']  . '/public/build'
+			: $_SERVER['DOCUMENT_ROOT'] . '/public/vite';
+
+		$manifest = json_decode(
+			file_get_contents($base . '/.vite/manifest.json'),
+			true
+		);
+
+		$parts = explode('.', $entry);
+		$parts = array_reverse($parts);
+		if ($parts[0] === 'js') {
+			return '<script src="' . ($production ? '/build/' : 'http://localhost:5173/') . $manifest[$entry]['file'] . ($production ? '' : '?v=' . time()) . '"></script>';
+		}
+		return '<link href="' . ($production ? '/build/' : 'http://localhost:5173/') . $manifest[$entry]['file'] . ($production ? '' : '?v=' . time()) . '" rel="stylesheet">';
+	}
+}
+

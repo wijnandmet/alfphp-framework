@@ -59,29 +59,29 @@ class Query
 
 
 
-	private function join($table, $keyValues) {
+	public function join($table, $keyValues) {
 		$this->_querybuilder['joins'][$table] = [
 			'keyValues' => $keyValues
 		];
 		return $this;
 	}
 
-	private function select($keyValues) {
+	public function select($keyValues) {
 		$this->_querybuilder['select'] = [...$this->_querybuilder['select'], $keyValues];
 		return $this;
 	}
 
-	private function order(string $order) {
+	public function order(string $order) {
 		$this->_querybuilder['order'][] = $order;
 		return $this;
 	}
 
-	private function group(mixed $group) {
+	public function group(mixed $group) {
 		$this->_querybuilder['group'][] = $group;
 		return $this;
 	}
 
-	private function limit(int $limit, int $offset = 0) {
+	public function limit(int $limit, int $offset = 0) {
 		$this->_querybuilder['limit'] = $limit;
 		$this->_querybuilder['offset'] = $offset;
 		return $this;
@@ -193,11 +193,6 @@ class Query
 		}
 
 		// limit
-		if ($querybuilder['limit'] !== null) {
-			$query[] = 'LIMIT ' . (int)$querybuilder['limit'];
-		}
-
-		// offset
 		if ($querybuilder['limit'] !== null) {
 			$query[] = 'LIMIT ' . (int)$querybuilder['limit'];
 
