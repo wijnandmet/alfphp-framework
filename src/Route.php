@@ -25,7 +25,7 @@ class Route {
             echo $content;
             exit;
         }
-
+		
         throw new \Exception('Route not found: ' . $uri);
     }
 

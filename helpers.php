@@ -86,14 +86,24 @@ if (!function_exists('array_flatten')) {
 }
 
 if (!function_exists('debug')) {
-    function debug($value, $stop = true)
-    {
-        echo '<pre>';
-        var_export($value);
-        echo '</pre>';
+	function debug($value, $stop = true)
+	{
+		echo '<pre>';
+		var_export($value);
+		echo '</pre>';
 		if ($stop) {
 			exit;
 		}
+	}
+}
+
+if (!function_exists('dump')) {
+    function dump($value, $stop = true)
+    {
+        $html = '<pre>';
+        $html .= var_export($value, true);
+        $html .= '</pre>';
+		return $html;
     }
 }
 

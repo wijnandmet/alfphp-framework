@@ -34,7 +34,7 @@ class View {
     }
 
 	private function addFrameworkMethods() {
-		$methods = ['lang', 'env', 'debug', 'vite'];
+		$methods = ['lang', 'env', 'dump', 'vite'];
 		foreach ($methods AS $methodname) {
 			$this->_twig->addFunction(new TwigFunction($methodname, function ($asset) use ($methodname) {
 				$params = func_get_args();
